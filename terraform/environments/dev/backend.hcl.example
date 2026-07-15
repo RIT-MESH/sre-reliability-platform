@@ -1,0 +1,7 @@
+﻿# Example backend configuration. Copy to backend.hcl and run:
+#   terraform init -backend-config=backend.hcl
+bucket         = "REPLACE_WITH_YOUR_TF_STATE_BUCKET"
+key            = "sre-reliability-platform/dev/terraform.tfstate"
+region         = "us-east-1"
+dynamodb_table = "sre-platform-tf-locks"
+encrypt        = true

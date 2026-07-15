@@ -1,0 +1,10 @@
+﻿output "alb_dns_name" { value = aws_lb.this.dns_name }
+output "alb_arn" { value = aws_lb.this.arn }
+output "alb_arn_suffix" { value = aws_lb.this.arn_suffix }
+output "target_group_arn" { value = aws_lb_target_group.app.arn }
+output "target_group_arn_suffix" { value = aws_lb_target_group.app.arn_suffix }
+output "asg_name" { value = aws_autoscaling_group.app.name }
+output "launch_template_id" { value = aws_launch_template.app.id }
+output "http_listener_arn" { value = aws_lb_listener.http.arn }
+output "https_listener_arn" { value = try(aws_lb_listener.https[0].arn, null) }
+output "instance_role_arn" { value = aws_iam_role.app.arn }

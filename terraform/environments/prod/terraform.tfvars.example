@@ -1,0 +1,8 @@
+﻿region            = "us-east-1"
+vpc_cidr          = "10.30.0.0/16"
+db_name           = "shop"
+ami_id            = "ami-0 REPLACE_WITH_AMAZON_LINUX_2023_AMI_ID"
+ecr_image         = "123456789012.dkr.ecr.us-east-1.amazonaws.com/sre-platform:latest"
+certificate_arn   = "arn:aws:acm:us-east-1:123456789012:certificate/REPLACE"
+alert_email       = "oncall@example.com"
+# redis_auth_token: sensitive, pass via TF_VAR_redis_auth_token

@@ -1,0 +1,5 @@
+﻿bucket         = "REPLACE_WITH_YOUR_TF_STATE_BUCKET"
+key            = "sre-reliability-platform/prod/terraform.tfstate"
+region         = "us-east-1"
+dynamodb_table = "sre-platform-tf-locks"
+encrypt        = true
