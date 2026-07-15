@@ -1,7 +1,7 @@
 ﻿"""Pydantic response schemas."""
 from __future__ import annotations
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class Product(BaseModel):
@@ -34,3 +34,4 @@ class HealthStatus(BaseModel):
 class ReadinessStatus(BaseModel):
     status: str
     checks: dict[str, str]
+

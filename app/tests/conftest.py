@@ -7,35 +7,14 @@ logic.
 """
 from __future__ import annotations
 
-import json
-from typing import Any
-
 import pytest
+from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from fastapi.testclient import TestClient
 
-import app.database as database
 import app.cache as cache
+import app.database as database
 from app import models  # noqa: F401  (ensures Base metadata is imported)
-from app.config import Settings
-
-
-@pytest.fixture()
-def settings_local(monkeypatch):
-    """Force deterministic, offline-friendly settings for the test run."""
-    for key, value in {
-        "DATABASE_URL": "sqlite:///:memory:",
-        "REDIS_URL": "redis://localhost:6379/0",
-        "CACHE_ENABLED": "true",
-        "ENVIRONMENT": "test",
-        "WORKERS": "1",
-        "INJECT_LATENCY_MS": "0",
-        "INJECT_FAILURE_RATE": "0",
-        "HIGH_CPU_LOAD": "false",
-    }.items():
-        monkeypatch.setenv(key, value)
-    return value
 
 
 class FakeRedis:
@@ -62,13 +41,15 @@ def fake_redis(monkeypatch):
 
 
 @pytest.fixture()
-def client(settings_local, fake_redis):
+def client(fake_redis):
     # Rebuild engine against SQLite in-memory and seed schema.
     database.engine = create_engine(
         "sqlite:///:memory:",
         connect_args={"check_same_thread": False},
     )
-    database.SessionLocal = sessionmaker(bind=database.engine, autoflush=False, autocommit=False)
+    database.SessionLocal = sessionmaker(
+        bind=database.engine, autoflush=False, autocommit=False
+    )
     database.Base.metadata.create_all(bind=database.engine)
     database.init_db()
 

@@ -6,7 +6,15 @@ gauges for Postgres and Redis.
 """
 from __future__ import annotations
 
-from prometheus_client import Counter, Gauge, Histogram, Registry, CollectorRegistry, CONTENT_TYPE_LATEST, generate_latest
+from prometheus_client import (
+    CONTENT_TYPE_LATEST,
+    CollectorRegistry,
+    Counter,
+    Gauge,
+    Histogram,
+    Registry,
+    generate_latest,
+)
 
 REGISTRY: Registry = CollectorRegistry()
 

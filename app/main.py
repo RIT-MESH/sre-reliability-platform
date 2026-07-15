@@ -31,7 +31,7 @@ from fastapi.responses import JSONResponse
 from . import cache, database, metrics
 from .config import settings
 from .logging_config import configure_logging
-from .schemas import HealthStatus, ProductList, Product, ReadinessStatus
+from .schemas import HealthStatus, Product, ProductList, ReadinessStatus
 
 logger = configure_logging()
 
@@ -53,6 +53,7 @@ def _maybe_inject_latency() -> None:
 def _maybe_inject_failure() -> None:
     if settings.inject_failure_rate > 0.0:
         import random
+
         if random.random() < settings.inject_failure_rate:
             raise HTTPException(status_code=500, detail="Injected 5xx for incident simulation")
 
@@ -74,11 +75,17 @@ async def lifespan(app: FastAPI):
         except (ValueError, OSError):
             # signal.signal only works in the main thread.
             pass
-    logger.info("app.starting", extra={"environment": settings.environment, "workers": settings.workers})
+    logger.info(
+        "app.starting",
+        extra={"environment": settings.environment, "workers": settings.workers},
+    )
     database.init_db()
     logger.info("app.ready")
     yield
-    logger.info("app.draining", extra={"timeout_seconds": settings.graceful_shutdown_timeout_seconds})
+    logger.info(
+        "app.draining",
+        extra={"timeout_seconds": settings.graceful_shutdown_timeout_seconds},
+    )
     _shutdown_event.wait(timeout=settings.graceful_shutdown_timeout_seconds)
     logger.info("app.stopped")
 
@@ -94,22 +101,27 @@ app = FastAPI(
 
 # --- Middleware -------------------------------------------------------------
 @app.middleware("http")
-async def request_id_middleware(request: Request, call_next: Callable[[Request], Awaitable[Response]]):
+async def request_id_middleware(
+    request: Request, call_next: Callable[[Request], Awaitable[Response]]
+):
     request_id = request.headers.get(settings.request_id_header) or str(uuid.uuid4())
     request.state.request_id = request_id
 
-    logging_context = {"request_id": request_id}
-
-    def _inject(record: logging.LogRecord) -> bool:
-        if not getattr(record, "request_id", None):
-            record.request_id = request_id
-        return True
-
-    token = logging.LoggerAdapter(logger, logging_context)  # noqa: F841
-    logger.info("http.request.start", extra={"method": request.method, "path": request.url.path, "request_id": request_id})
+    logger.info(
+        "http.request.start",
+        extra={
+            "method": request.method,
+            "path": request.url.path,
+            "request_id": request_id,
+        },
+    )
 
     if _shutdown_event.is_set():
-        return JSONResponse(status_code=503, content={"detail": "Service shutting down"}, headers={settings.request_id_header: request_id})
+        return JSONResponse(
+            status_code=503,
+            content={"detail": "Service shutting down"},
+            headers={settings.request_id_header: request_id},
+        )
 
     start = time.perf_counter()
     status_code = 500
@@ -118,21 +130,40 @@ async def request_id_middleware(request: Request, call_next: Callable[[Request],
         status_code = response.status_code
         return response
     except Exception:
-        logger.exception("http.request.error", extra={"method": request.method, "path": request.url.path})
+        logger.exception(
+            "http.request.error",
+            extra={"method": request.method, "path": request.url.path},
+        )
         status_code = 500
-        return JSONResponse(status_code=500, content={"detail": "Internal Server Error"}, headers={settings.request_id_header: request_id})
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "Internal Server Error"},
+            headers={settings.request_id_header: request_id},
+        )
     finally:
         elapsed = time.perf_counter() - start
-        metrics.REQUEST_COUNT.labels(method=request.method, path=request.url.path, status=str(status_code)).inc()
-        metrics.REQUEST_LATENCY.labels(method=request.method, path=request.url.path).observe(elapsed)
+        metrics.REQUEST_COUNT.labels(
+            method=request.method, path=request.url.path, status=str(status_code)
+        ).inc()
+        metrics.REQUEST_LATENCY.labels(
+            method=request.method, path=request.url.path
+        ).observe(elapsed)
         logger.info(
             "http.request.end",
-            extra={"method": request.method, "path": request.url.path, "status": status_code, "duration_ms": round(elapsed * 1000, 2), "request_id": request_id},
+            extra={
+                "method": request.method,
+                "path": request.url.path,
+                "status": status_code,
+                "duration_ms": round(elapsed * 1000, 2),
+                "request_id": request_id,
+            },
         )
 
 
 @app.middleware("http")
-async def metrics_middleware(request: Request, call_next: Callable[[Request], Awaitable[Response]]):
+async def metrics_middleware(
+    request: Request, call_next: Callable[[Request], Awaitable[Response]]
+):
     if request.url.path == "/metrics":
         return await call_next(request)
     metrics.IN_PROGRESS.inc()
@@ -160,9 +191,15 @@ def readiness() -> ReadinessStatus:
     """Readiness probe. 503 when the database is unreachable."""
     db_ok = database.ping()
     redis_ok = cache.ping()
-    checks = {"database": "ok" if db_ok else "down", "redis": "ok" if redis_ok else "down"}
+    checks = {
+        "database": "ok" if db_ok else "down",
+        "redis": "ok" if redis_ok else "down",
+    }
     if not db_ok:
-        raise HTTPException(status_code=503, detail=ReadinessStatus(status="not ready", checks=checks).model_dump())
+        raise HTTPException(
+            status_code=503,
+            detail=ReadinessStatus(status="not ready", checks=checks).model_dump(),
+        )
     return ReadinessStatus(status="ready", checks=checks)
 
 
@@ -188,10 +225,13 @@ def list_products(page: int = 1, page_size: int = 20):
     with database.session_scope() as session:
         from sqlalchemy import func, select
 
-        total = session.execute(select(func.count(Product.id))).scalar_one()
+        total = session.execute(select(func.count(database.Product.id))).scalar_one()
         rows = (
             session.execute(
-                select(Product).order_by(Product.id).offset((page - 1) * page_size).limit(page_size)
+                select(database.Product)
+                .order_by(database.Product.id)
+                .offset((page - 1) * page_size)
+                .limit(page_size)
             )
             .scalars()
             .all()
@@ -222,7 +262,12 @@ def get_product(product_id: int):
     with database.session_scope() as session:
         from sqlalchemy import select
 
-        product = session.execute(select(Product).where(Product.id == product_id)).scalar_one_or_none()
+        product = (
+            session.execute(
+                select(database.Product).where(database.Product.id == product_id)
+            )
+            .scalar_one_or_none()
+        )
         if product is None:
             raise HTTPException(status_code=404, detail="Product not found")
         data = Product.model_validate(product).model_dump()

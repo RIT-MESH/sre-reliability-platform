@@ -15,7 +15,7 @@ import redis
 from redis.exceptions import RedisError
 
 from .config import settings
-from .metrics import REDIS_AVAILABLE, CACHE_HITS, CACHE_MISSES
+from .metrics import CACHE_HITS, CACHE_MISSES, REDIS_AVAILABLE
 
 logger = logging.getLogger(settings.app_name)
 
@@ -84,3 +84,4 @@ def ping() -> bool:
     except RedisError:
         REDIS_AVAILABLE.set(0)
         return False
+
