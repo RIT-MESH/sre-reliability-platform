@@ -56,9 +56,9 @@ No check below is marked "passed" unless it was actually executed and succeeded.
 - `terraform/environments/prod/backend.hcl.example` → `backend.hcl`
 - `terraform/environments/prod/terraform.tfvars.example` → `terraform.tfvars`
 - `.env.example` → `.env` (local only, optional)
-- GitHub environment secrets/variables: `AWS_ROLE_ARN`, `AWS_REGION`,
-  `TF_VAR_ami_id`, `TF_VAR_ecr_image`, `TF_VAR_alert_email`,
-  `TF_VAR_redis_auth_token` (see `deploy.yml` comments)
+- GitHub environment secrets/variables (only if you later add a CI deploy workflow using the bootstrap OIDC role): `AWS_ROLE_ARN`, `AWS_REGION`,
+  `TF_VAR_ami_id`, `TF_VAR_ecr_image`, `TF_VAR_alert_email`, `TF_VAR_redis_auth_token`
+  (the AWS deployment workflow has been removed; see `terraform/bootstrap` for the OIDC role)
 - `.github/CODEOWNERS.example` → `.github/CODEOWNERS`
 
 ## Post-report static-inspection fixes (committed)

@@ -24,7 +24,7 @@ scripts, safe local incident simulations and SLO/SLI/error-budget documentation.
 | IaC | Modular Terraform (networking, security, compute, database, cache, storage, monitoring) with dev/prod environments |
 | Automation | Bash scripts for up/down/validate/terraform ops/backup/restore/health/logs/load-test/incidents/recovery |
 | Incident response | 6 documented local incident simulations with runbooks; AWS actions require explicit confirmation |
-| CI/CD | GitHub Actions: lint, test, tf fmt/validate, Docker build/scan, security scans, OIDC manual deploy |
+| CI/CD | GitHub Actions: lint, test, tf fmt/validate, Docker build/scan, security scans |
 
 ## Business problem
 
@@ -209,8 +209,7 @@ make down                     # stop (volumes preserved)
 4. Provide `TF_VAR_redis_auth_token` from Secrets Manager.
 5. `terraform init -backend-config=backend.hcl && terraform validate && terraform plan -out=tfplan && terraform apply tfplan`
 6. Verify the ALB DNS health endpoint.
-7. For CI/CD, use the `AWS deployment` workflow (manual `workflow_dispatch`,
-   OIDC, no long-lived keys).
+7. CI/CD runs **validation and security scans only** (no AWS deployment workflow, since no AWS account is required for the portfolio). AWS deployment is performed manually with the Terraform CLI above; the GitHub OIDC role from `terraform/bootstrap` is available if you later wire a deployment pipeline.
 
 ## Testing
 
@@ -290,3 +289,5 @@ sre-reliability-platform/
 - Read replicas + connection pooling via RDS Proxy.
 - Chaos automation (e.g., Chaos Mesh / AWS FIS) for prod incident drills.
 - OpenTelemetry traces alongside metrics and logs.
+
+

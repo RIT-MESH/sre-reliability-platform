@@ -58,30 +58,39 @@ curl http://<alb>/metrics
 
 ### 5. CI/CD (GitHub Actions)
 
-Use the **AWS deployment** workflow (manual `workflow_dispatch`). It uses GitHub
-OIDC (`permissions: id-token: write`) to assume `AWS_ROLE_ARN` — no long-lived
-keys. Configure GitHub **environments** `dev` and `prod` (prod should require
-reviewers). Required env secrets/variables are listed in the workflow comments.
+The repository's GitHub Actions run **validation and security scans only** —
+there is intentionally **no AWS deployment workflow**, because deploying
+requires an AWS account and billable resources and is not needed for the
+portfolio. The workflows that run automatically on push/PR:
+
+- Python lint (ruff) + unit tests (pytest)
+- Terraform `fmt` + `validate` + tfsec
+- Docker image build + Trivy scan (fails on HIGH/CRITICAL)
+- Secret scanning (gitleaks) + dependency scanning (pip-audit)
+
+AWS deployment is performed manually with the Terraform CLI (steps 1–4 above).
+If you later want CI-driven deployment, `terraform/bootstrap` already creates a
+GitHub OIDC IAM role (`github_actions_role_arn` output) so you can add a
+`workflow_dispatch` deploy workflow that assumes it with
+`permissions: id-token: write` — no long-lived keys.
 
 ```mermaid
 flowchart LR
   PR[Pull request] --> CI[lint/test/validate/scan]
   Main[main branch] --> CI
-  CI --> OIDC[GitHub OIDC]
-  OIDC --> Role[AWS IAM role]
-  Workflow[workflow_dispatch deploy] --> Role
-  Role --> TF[terraform plan/apply]
+  CI --> Green[validation + security scans]
+  Manual[Manual terraform CLI] --> TF[terraform plan/apply]
   TF --> ALB[ALB + ASG + RDS + Redis]
-  ALB --> Health[post-deploy health check]
+  ALB --> Health[health check]
   Health -->|fail| Rollback[rollback: pin previous image]
 ```
 
-## Rolling deployment & rollback
+## Rolling deployment & rollback (manual)
 
-- New image tag → update `TF_VAR_ecr_image` → re-run deploy workflow `apply`.
+- New image tag → update `TF_VAR_ecr_image` → re-run `terraform apply`.
 - ASG rolling instance refresh replaces instances with min-healthy 50%.
-- If `/health` fails after apply: pin `TF_VAR_ecr_image` to the last good tag and
-  re-apply (rollback). Infra regressions: targeted `terraform state`/apply.
+- If `/health` fails after apply: pin `TF_VAR_ecr_image` to the last good tag
+  and re-apply (rollback). Infra regressions: targeted `terraform state`/apply.
 
 ## Cleanup
 
