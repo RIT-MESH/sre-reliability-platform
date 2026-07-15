@@ -1,0 +1,24 @@
+﻿name: Docker build and scan
+
+on:
+  push:
+    branches: [main]
+    paths: ["app/**", "docker-compose.yml", ".github/workflows/docker.yml"]
+  pull_request:
+    paths: ["app/**", "docker-compose.yml", ".github/workflows/docker.yml"]
+
+jobs:
+  build-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build app image
+        run: docker build -t sre-platform:ci ./app
+      - name: Validate docker-compose
+        run: docker compose config -q
+      - name: Trivy container scan
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: sre-platform:ci
+          severity: HIGH,CRITICAL
+          exit-code: "0"

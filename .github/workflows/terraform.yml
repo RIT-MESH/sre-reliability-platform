@@ -1,0 +1,39 @@
+﻿name: Terraform validation
+
+on:
+  push:
+    branches: [main]
+    paths: ["terraform/**", ".github/workflows/terraform.yml"]
+  pull_request:
+    paths: ["terraform/**", ".github/workflows/terraform.yml"]
+
+jobs:
+  fmt-validate:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        env: [dev, prod]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.8"
+          terraform_wrapper: false
+      - name: Terraform fmt
+        run: terraform fmt -recursive -check -diff
+        working-directory: terraform
+      - name: Terraform init (no backend)
+        run: terraform init -backend=false
+        working-directory: terraform/environments/${{ matrix.env }}
+      - name: Terraform validate
+        run: terraform validate
+        working-directory: terraform/environments/${{ matrix.env }}
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: tfsec
+        uses: aquasecurity/tfsec-action@v1.0.3
+        with:
+          working_directory: terraform

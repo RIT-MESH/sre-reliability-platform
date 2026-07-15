@@ -1,0 +1,35 @@
+﻿name: Bug report
+description: Report a defect in the sre-reliability-platform
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened and what did you expect?
+    validations:
+      required: true
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      options: ["local docker-compose", "AWS dev", "AWS prod", "CI"]
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. ...\n2. ..."
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs / metrics / alerts
+      render: shell
+  - type: textarea
+    id: fix
+    attributes:
+      label: Proposed fix (optional)

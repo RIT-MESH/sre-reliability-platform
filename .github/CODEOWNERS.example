@@ -1,0 +1,9 @@
+﻿# Example CODEOWNERS. Copy to .github/CODEOWNERS and adjust.
+# Format: <path-pattern> @<github-user-or-team>
+
+*                           @RIT-MESH
+/app/                       @RIT-MESH
+/terraform/                 @RIT-MESH
+/monitoring/                @RIT-MESH
+/.github/workflows/         @RIT-MESH
+/docs/                      @RIT-MESH
