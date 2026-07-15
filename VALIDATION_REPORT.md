@@ -60,3 +60,23 @@ No check below is marked "passed" unless it was actually executed and succeeded.
   `TF_VAR_ami_id`, `TF_VAR_ecr_image`, `TF_VAR_alert_email`,
   `TF_VAR_redis_auth_token` (see `deploy.yml` comments)
 - `.github/CODEOWNERS.example` → `.github/CODEOWNERS`
+
+## Post-report static-inspection fixes (committed)
+
+While tools (ruff/pytest/terraform/docker) remained unavailable, a deeper
+static review found and fixed issues before the first CI run:
+
+- **Fixed: missing `app/models.py`** — `app/tests/conftest.py` imported
+  `from app import models` but no `models.py` existed, which would have
+  broken pytest collection. ORM `Base`/`Product` were extracted into
+  `app/models.py` and re-imported by `database.py`.
+- **Removed dead code** in `main.py` (unused `LoggerAdapter` line).
+- **Wrapped all `app/**/*.py` lines to <=120** (verified by scan) and added
+  `pyproject.toml` with ruff `line-length = 120`, `target-version = "py312"`
+  plus pytest config, so `ruff check`/`ruff format --check` use project settings.
+- **Fixed isort ordering** in `database.py`, `cache.py`, `schemas.py`,
+  `conftest.py` to match ruff `order-by-type` defaults.
+
+These reduce (but do not guarantee) first-run CI failures; authoritative
+validation still requires the tools to run. See commit
+`fix: split ORM models into app/models.py and harden code for CI`.
