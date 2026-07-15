@@ -1,0 +1,19 @@
+﻿# Build artefacts, secrets and local files excluded from the Docker context.
+.git
+.github
+docs
+terraform
+incidents
+scripts
+load-testing/results
+collected-logs
+backups
+*.md
+.env
+.env.*
+*.tfstate
+.terraform/
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/

@@ -1,0 +1,70 @@
+﻿# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.ppk
+id_rsa*
+*.p12
+*.pfx
+
+# Terraform
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfplan.*
+.terraform/
+.terraform.lock.hcl
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+backend.hcl
+*.auto.tfvars
+terraform.tfvars
+.terraform.tfstate.lock.info
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+env/
+*.egg-info/
+
+# Local DB files
+*.sqlite
+*.sqlite3
+*.db
+
+# Logs
+*.log
+logs/
+collected-logs/
+
+# Load test results
+load-testing/results/*
+!load-testing/results/.gitkeep
+
+# Backups
+backups/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Docker
+*.tar
