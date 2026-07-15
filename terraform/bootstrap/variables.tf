@@ -1,4 +1,4 @@
-﻿variable "region" {
+variable "region" {
   type        = string
   description = "AWS region for bootstrap resources."
   default     = "us-east-1"

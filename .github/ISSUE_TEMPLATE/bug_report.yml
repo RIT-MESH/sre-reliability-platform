@@ -1,4 +1,4 @@
-﻿name: Bug report
+name: Bug report
 description: Report a defect in the sre-reliability-platform
 title: "[bug] "
 labels: ["bug"]

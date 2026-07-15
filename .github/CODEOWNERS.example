@@ -1,4 +1,4 @@
-﻿# Example CODEOWNERS. Copy to .github/CODEOWNERS and adjust.
+# Example CODEOWNERS. Copy to .github/CODEOWNERS and adjust.
 # Format: <path-pattern> @<github-user-or-team>
 
 *                           @RIT-MESH

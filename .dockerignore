@@ -1,4 +1,4 @@
-﻿# Build artefacts, secrets and local files excluded from the Docker context.
+# Build artefacts, secrets and local files excluded from the Docker context.
 .git
 .github
 docs

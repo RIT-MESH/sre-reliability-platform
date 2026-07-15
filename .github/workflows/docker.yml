@@ -1,6 +1,7 @@
-﻿name: Docker build and scan
+name: Docker build and scan
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
     paths: ["app/**", "docker-compose.yml", ".github/workflows/docker.yml"]
@@ -16,13 +17,10 @@ jobs:
         run: docker build -t sre-platform:ci ./app
       - name: Validate docker-compose
         run: docker compose config -q
-      - name: Trivy container scan
-        uses: aquasecurity/trivy-action@v0.28.0
-        with:
-          image-ref: sre-platform:ci
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
-          exit-code: "1"
-
-
-
+      - name: Install Trivy
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+          trivy --version
+      - name: Trivy container scan (fail on fixable HIGH/CRITICAL)
+        run: |
+          trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 --no-progress sre-platform:ci

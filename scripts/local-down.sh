@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Stop the local Docker Compose stack (volumes preserved).
 set -euo pipefail
 source "$(dirname "$0")/common.sh"

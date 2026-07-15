@@ -1,4 +1,4 @@
-﻿"""Locust load test for the sre-reliability-platform API.
+"""Locust load test for the sre-reliability-platform API.
 
 Run locally against the Docker Compose stack:
 

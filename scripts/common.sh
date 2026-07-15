@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Shared helpers for sre-reliability-platform scripts.
 # Sourced by other scripts; not meant to be run directly.
 set -euo pipefail

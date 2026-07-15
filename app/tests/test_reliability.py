@@ -1,4 +1,5 @@
-﻿"""Cache fallback and incident-injection tests."""
+"""Cache fallback and incident-injection tests."""
+
 from __future__ import annotations
 
 import app.cache as cache
@@ -36,10 +37,12 @@ def test_degraded_mode_when_redis_down(client, monkeypatch, fake_redis):
 def test_injected_500(client, monkeypatch):
     monkeypatch.setenv("INJECT_FAILURE_RATE", "1.0")
     # Reload settings so the flag is picked up.
-    from app.config import Settings
     import app.config as cfg
+    from app.config import Settings
+
     cfg.settings = Settings()
     import app.main as main
+
     main.settings = cfg.settings
     r = client.get("/products")
     assert r.status_code == 500
@@ -51,12 +54,15 @@ def test_injected_500(client, monkeypatch):
 
 def test_injected_latency(client, monkeypatch):
     monkeypatch.setenv("INJECT_LATENCY_MS", "50")
-    from app.config import Settings
     import app.config as cfg
+    from app.config import Settings
+
     cfg.settings = Settings()
     import app.main as main
+
     main.settings = cfg.settings
     import time
+
     start = time.perf_counter()
     r = client.get("/products?page=1&page_size=2")
     elapsed = time.perf_counter() - start

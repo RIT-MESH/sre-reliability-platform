@@ -1,4 +1,4 @@
-﻿locals {
+locals {
   name_prefix = "sre-dev"
   common_tags = {
     Project     = "sre-reliability-platform"

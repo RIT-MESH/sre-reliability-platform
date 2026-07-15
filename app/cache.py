@@ -1,9 +1,10 @@
-﻿"""Redis caching with graceful fallback.
+"""Redis caching with graceful fallback.
 
 When Redis is unavailable the application keeps serving requests from the
 database (degraded mode). Cache availability is reported as a metric and in
 health checks, but Redis outages never produce user-visible 5xx errors.
 """
+
 from __future__ import annotations
 
 import json
@@ -84,4 +85,3 @@ def ping() -> bool:
     except RedisError:
         REDIS_AVAILABLE.set(0)
         return False
-

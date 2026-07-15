@@ -1,4 +1,4 @@
-﻿# Disaster recovery
+# Disaster recovery
 
 ## RTO / RPO targets
 

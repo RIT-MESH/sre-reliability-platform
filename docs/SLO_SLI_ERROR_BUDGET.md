@@ -1,4 +1,4 @@
-﻿# SLOs, SLIs and error budgets
+# SLOs, SLIs and error budgets
 
 > Values below are **targets and worked examples**, not measured production
 > results. Real SLI values require actual traffic and monitoring data.

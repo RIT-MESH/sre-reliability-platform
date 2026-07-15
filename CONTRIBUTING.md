@@ -1,4 +1,4 @@
-﻿# Contributing to sre-reliability-platform
+# Contributing to sre-reliability-platform
 
 Thanks for your interest in contributing! This is a portfolio project, but
 contributions, improvements and corrections are welcome.

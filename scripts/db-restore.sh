@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Restore PostgreSQL from a backup file into the local stack.
 # Usage: db-restore.sh <backup-file.sql.gz>
 set -euo pipefail

@@ -1,4 +1,4 @@
-﻿# Bootstrap creates the *prerequisites* that the main Terraform stack depends on:
+# Bootstrap creates the *prerequisites* that the main Terraform stack depends on:
 #   * An S3 bucket to hold Terraform state
 #   * A DynamoDB table for state locking
 #   * An IAM role assumable by GitHub Actions via OIDC for plan/apply
@@ -41,7 +41,10 @@ resource "aws_s3_bucket_versioning" "tf_state" {
 resource "aws_s3_bucket_server_side_encryption_configuration" "tf_state" {
   bucket = aws_s3_bucket.tf_state.id
   rule {
-    apply_server_side_encryption_by_default { sse_algorithm = "aws:kms", kms_master_key_id = aws_kms_key.tf_state.arn }
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = aws_kms_key.tf_state.arn
+    }
   }
 }
 

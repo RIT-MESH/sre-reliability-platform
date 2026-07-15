@@ -1,9 +1,10 @@
-﻿"""Prometheus metrics registry and helpers.
+"""Prometheus metrics registry and helpers.
 
 Exposes HTTP request count, latency histograms (with P50/P95/P99 via
 histogram_quantile), in-progress requests, and dependency availability
 gauges for Postgres and Redis.
 """
+
 from __future__ import annotations
 
 from prometheus_client import (
@@ -12,11 +13,10 @@ from prometheus_client import (
     Counter,
     Gauge,
     Histogram,
-    Registry,
     generate_latest,
 )
 
-REGISTRY: Registry = CollectorRegistry()
+REGISTRY: CollectorRegistry = CollectorRegistry()
 
 REQUEST_COUNT = Counter(
     "http_requests_total",

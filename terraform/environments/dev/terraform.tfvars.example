@@ -1,4 +1,4 @@
-﻿# Example variable values for the dev environment.
+# Example variable values for the dev environment.
 # Copy to terraform.tfvars and edit. NEVER commit real secrets.
 region            = "us-east-1"
 vpc_cidr          = "10.20.0.0/16"

@@ -1,4 +1,4 @@
-﻿# dev environment
+# dev environment
 
 Lower-cost defaults for development and interview walkthroughs.
 

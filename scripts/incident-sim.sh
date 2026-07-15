@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Run a local incident simulation.
 # Usage: incident-sim.sh <scenario> [--confirm-aws]
 # Scenarios: app-crash redis-outage db-outage latency 5xx-spike high-cpu

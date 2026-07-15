@@ -1,4 +1,4 @@
-﻿# Load testing results
+# Load testing results
 
 Locust CSV outputs (`_stats.csv`, `_failures.csv`, `_stats_history.csv`) are
 generated here when running with `--csv`. These files are git-ignored.

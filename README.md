@@ -1,4 +1,4 @@
-﻿# sre-reliability-platform
+# sre-reliability-platform
 
 A production-style **Site Reliability Engineering** portfolio project demonstrating
 reliability, fault tolerance, scalability, observability, performance engineering,

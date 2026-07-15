@@ -1,8 +1,9 @@
-﻿"""Database engine, session management and resilience helpers.
+"""Database engine, session management and resilience helpers.
 
 The ORM models live in :mod:`app.models`; this module owns the engine, the
 session factory, retry-with-backoff logic and the health-check ping.
 """
+
 from __future__ import annotations
 
 import logging
@@ -102,46 +103,40 @@ def init_db() -> None:
 
 @contextmanager
 def session_scope():
-    """Yield a Session with retry-on-connect and automatic close/rollback."""
-    last_error: SQLAlchemyError | None = None
+    """Yield a Session with automatic rollback on error and close on exit.
+
+    A ``@contextmanager`` may only yield once, so connect-time resilience is
+    handled by ``pool_pre_ping`` plus the retry loop in :func:`ping` rather than
+    by re-yielding here.
+    """
+    session: Session = SessionLocal()
+    try:
+        yield session
+        DB_AVAILABLE.set(1)
+    except SQLAlchemyError:
+        session.rollback()
+        DB_AVAILABLE.set(0)
+        raise
+    finally:
+        session.close()
+
+
+def ping() -> bool:
+    """Retry a lightweight ``SELECT 1`` to check DB reachability."""
     for attempt in range(1, settings.db_retry_attempts + 1):
-        session: Session = SessionLocal()
         try:
-            yield session
+            with engine.connect() as conn:
+                conn.execute(text("SELECT 1"))
             DB_AVAILABLE.set(1)
-            return
+            return True
         except SQLAlchemyError as exc:
-            last_error = exc
-            session.rollback()
             if attempt < settings.db_retry_attempts:
                 sleep_for = settings.db_retry_backoff_seconds * attempt
                 logger.warning(
                     "database.retry",
-                    extra={
-                        "attempt": attempt,
-                        "sleep_seconds": sleep_for,
-                        "error": str(exc),
-                    },
+                    extra={"attempt": attempt, "sleep_seconds": sleep_for, "error": str(exc)},
                 )
                 time.sleep(sleep_for)
-                session.close()
                 continue
-            DB_AVAILABLE.set(0)
-            raise
-        finally:
-            session.close()
     DB_AVAILABLE.set(0)
-    raise last_error  # type: ignore[misc]
-
-
-def ping() -> bool:
-    """Lightweight DB reachability check used by health/readiness."""
-    try:
-        with engine.connect() as conn:
-            conn.execute(text("SELECT 1"))
-        DB_AVAILABLE.set(1)
-        return True
-    except SQLAlchemyError:
-        DB_AVAILABLE.set(0)
-        return False
-
+    return False

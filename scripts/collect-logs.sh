@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Collect logs from all local containers into ./collected-logs/.
 set -euo pipefail
 source "$(dirname "$0")/common.sh"

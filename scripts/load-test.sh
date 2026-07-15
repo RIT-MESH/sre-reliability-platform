@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Run the Locust load test against the local stack.
 # Usage: load-test.sh [users] [spawn-rate] [duration]
 set -euo pipefail

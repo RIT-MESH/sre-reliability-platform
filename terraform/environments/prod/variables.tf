@@ -1,4 +1,7 @@
-﻿variable "region" { type = string, default = "us-east-1" }
+variable "region" {
+  type    = string
+  default = "us-east-1"
+}
 
 variable "vpc_cidr" {
   type    = string
@@ -9,9 +12,31 @@ variable "vpc_cidr" {
   }
 }
 
-variable "db_name" { type = string, default = "shop" }
-variable "ami_id" { type = string, description = "Amazon Linux 2023 AMI id for the app region." }
-variable "ecr_image" { type = string, description = "ECR image URI to deploy." }
-variable "redis_auth_token" { type = string, sensitive = true, description = "Redis AUTH token via TF_VAR_redis_auth_token / Secrets Manager." }
-variable "certificate_arn" { type = string, nullable = true, default = null, description = "ACM certificate ARN for the HTTPS listener." }
-variable "alert_email" { type = string, nullable = true, default = null }
+variable "db_name" {
+  type    = string
+  default = "shop"
+}
+variable "ami_id" {
+  type        = string
+  description = "Amazon Linux 2023 AMI id for the app region."
+}
+variable "ecr_image" {
+  type        = string
+  description = "ECR image URI to deploy."
+}
+variable "redis_auth_token" {
+  type        = string
+  sensitive   = true
+  description = "Redis AUTH token via TF_VAR_redis_auth_token / Secrets Manager."
+}
+variable "certificate_arn" {
+  type        = string
+  nullable    = true
+  default     = null
+  description = "ACM certificate ARN for the HTTPS listener."
+}
+variable "alert_email" {
+  type     = string
+  nullable = true
+  default  = null
+}

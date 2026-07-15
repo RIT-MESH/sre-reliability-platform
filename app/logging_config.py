@@ -1,15 +1,16 @@
-﻿"""Structured JSON logging configuration.
+"""Structured JSON logging configuration.
 
 Emits one JSON object per log line containing timestamp, level, logger,
 message, request_id (when available) and any extra fields. This format is
 friendly for CloudWatch Logs, Loki and `jq`.
 """
+
 from __future__ import annotations
 
 import json
 import logging
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from .config import settings
@@ -20,7 +21,7 @@ class JsonFormatter(logging.Formatter):
 
     def format(self, record: logging.LogRecord) -> str:
         payload: dict[str, Any] = {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "level": record.levelname,
             "logger": record.name,
             "message": record.getMessage(),

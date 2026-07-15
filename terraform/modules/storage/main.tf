@@ -1,4 +1,4 @@
-﻿terraform { required_version = ">= 1.7.0" }
+terraform { required_version = ">= 1.7.0" }
 
 resource "aws_s3_bucket" "this" {
   bucket        = var.bucket_name
@@ -14,7 +14,10 @@ resource "aws_s3_bucket_versioning" "this" {
 resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
   bucket = aws_s3_bucket.this.id
   rule {
-    apply_server_side_encryption_by_default { sse_algorithm = "aws:kms", kms_master_key_id = var.kms_key_id }
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = var.kms_key_id
+    }
   }
 }
 
@@ -32,8 +35,14 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
     id     = "transition-backups"
     status = "Enabled"
     filter { prefix = "backups/" }
-    transition { days = 30, storage_class = "STANDARD_IA" }
-    transition { days = 90, storage_class = "GLACIER" }
+    transition {
+      days          = 30
+      storage_class = "STANDARD_IA"
+    }
+    transition {
+      days          = 90
+      storage_class = "GLACIER"
+    }
     expiration { days = 365 }
   }
   rule {
@@ -52,9 +61,12 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 
 data "aws_iam_policy_document" "bucket_policy" {
   statement {
-    sid       = "DenyInsecureTransport"
-    effect    = "Deny"
-    principals { type = "AWS", identifiers = ["*"] }
+    sid    = "DenyInsecureTransport"
+    effect = "Deny"
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
     actions   = ["s3:*"]
     resources = [aws_s3_bucket.this.arn, "${aws_s3_bucket.this.arn}/*"]
     condition {

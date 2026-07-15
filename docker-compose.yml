@@ -1,4 +1,4 @@
-﻿# Local Docker Compose stack for the sre-reliability-platform.
+# Local Docker Compose stack for the sre-reliability-platform.
 # Mirrors the AWS topology (app + Postgres + Redis + reverse proxy + metrics)
 # in a single host for development, demos and incident simulations.
 #

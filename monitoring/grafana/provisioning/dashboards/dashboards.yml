@@ -1,4 +1,4 @@
-﻿apiVersion: 1
+apiVersion: 1
 providers:
   - name: sre-platform
     orgId: 1

@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Deploy (re)build and restart the app container in the local stack.
 set -euo pipefail
 source "$(dirname "$0")/common.sh"

@@ -1,4 +1,4 @@
-﻿region            = "us-east-1"
+region            = "us-east-1"
 vpc_cidr          = "10.30.0.0/16"
 db_name           = "shop"
 ami_id            = "ami-0 REPLACE_WITH_AMAZON_LINUX_2023_AMI_ID"

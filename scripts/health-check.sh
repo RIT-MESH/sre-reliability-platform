@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Post-deployment health check. Exits non-zero if the endpoint is not healthy.
 # Usage: health-check.sh [url]
 set -euo pipefail

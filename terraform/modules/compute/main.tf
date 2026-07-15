@@ -1,4 +1,4 @@
-﻿terraform { required_version = ">= 1.7.0" }
+terraform { required_version = ">= 1.7.0" }
 
 # ---------------------------------------------------------------------------
 # Application Load Balancer
@@ -130,13 +130,13 @@ resource "aws_iam_role_policy_attachment" "cw_agent" {
 # ---------------------------------------------------------------------------
 locals {
   user_data = templatefile("${path.module}/user-data.sh.tpl", {
-    app_port        = var.app_port
-    ecr_image       = var.ecr_image
-    db_host         = var.db_host
-    db_secret_arn   = var.db_secret_arn
-    redis_host      = var.redis_host
-    environment     = var.environment
-    workers         = var.workers
+    app_port      = var.app_port
+    ecr_image     = var.ecr_image
+    db_host       = var.db_host
+    db_secret_arn = var.db_secret_arn
+    redis_host    = var.redis_host
+    environment   = var.environment
+    workers       = var.workers
   })
 }
 
@@ -170,8 +170,8 @@ resource "aws_launch_template" "app" {
   }
 
   metadata_options {
-    http_endpoint = "enabled"
-    http_tokens   = "required" # IMDSv2 enforced
+    http_endpoint               = "enabled"
+    http_tokens                 = "required" # IMDSv2 enforced
     http_put_response_hop_limit = 1
   }
 
@@ -192,8 +192,8 @@ resource "aws_autoscaling_group" "app" {
   max_size            = var.max_size
   desired_capacity    = var.desired_size
 
-  target_group_arns = [aws_lb_target_group.app.arn]
-  health_check_type = "ELB"
+  target_group_arns         = [aws_lb_target_group.app.arn]
+  health_check_type         = "ELB"
   health_check_grace_period = 90
 
   launch_template {

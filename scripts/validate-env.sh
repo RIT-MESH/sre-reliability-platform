@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Validate the local environment: check required tools and config files.
 set -euo pipefail
 source "$(dirname "$0")/common.sh"

@@ -1,4 +1,4 @@
-﻿terraform { required_version = ">= 1.7.0" }
+terraform { required_version = ">= 1.7.0" }
 
 # Least-privilege security groups. Each group references the others by ID so no
 # broad 0.0.0.0/0 ingress is allowed on data tiers.
@@ -71,9 +71,9 @@ resource "aws_security_group" "db" {
     security_groups = [aws_security_group.app.id]
   }
   egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = [var.vpc_cidr]
   }
   tags = merge(var.tags, { Name = "${var.name_prefix}-db-sg" })
@@ -91,9 +91,9 @@ resource "aws_security_group" "redis" {
     security_groups = [aws_security_group.app.id]
   }
   egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = [var.vpc_cidr]
   }
   tags = merge(var.tags, { Name = "${var.name_prefix}-redis-sg" })

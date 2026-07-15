@@ -1,4 +1,5 @@
-﻿"""Pydantic response schemas."""
+"""Pydantic response schemas."""
+
 from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -34,4 +35,3 @@ class HealthStatus(BaseModel):
 class ReadinessStatus(BaseModel):
     status: str
     checks: dict[str, str]
-

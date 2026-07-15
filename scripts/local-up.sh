@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Start the local Docker Compose stack.
 set -euo pipefail
 source "$(dirname "$0")/common.sh"

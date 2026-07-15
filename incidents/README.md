@@ -1,4 +1,4 @@
-﻿# Incident simulations
+# Incident simulations
 
 Safe, local-first chaos engineering for the sre-reliability-platform.
 

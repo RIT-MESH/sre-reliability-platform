@@ -1,4 +1,4 @@
-﻿# Automation scripts
+# Automation scripts
 
 All shell scripts use `set -euo pipefail`, validate input, handle errors and ask
 for confirmation before destructive actions.

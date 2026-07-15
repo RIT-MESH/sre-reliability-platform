@@ -1,4 +1,4 @@
-﻿# Runbook
+# Runbook
 
 Operational runbooks for the sre-reliability-platform. Commands target the
 **local Docker Compose** stack unless noted. AWS commands are prefixed and

@@ -1,4 +1,4 @@
-﻿# CloudWatch monitoring
+# CloudWatch monitoring
 
 The Terraform `monitoring` module provisions:
 - an SNS alert topic (+ optional email subscription)

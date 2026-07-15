@@ -1,4 +1,4 @@
-﻿# Performance testing
+# Performance testing
 
 ## Methodology
 

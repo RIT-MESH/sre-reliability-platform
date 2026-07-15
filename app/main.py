@@ -1,4 +1,4 @@
-﻿"""FastAPI application entrypoint.
+"""FastAPI application entrypoint.
 
 Endpoints:
   GET  /health            Liveness probe (always 200 while process is alive).
@@ -15,15 +15,15 @@ Reliability features:
   * Optional latency/failure injection for incident simulation.
   * Graceful shutdown with a configurable drain timeout.
 """
+
 from __future__ import annotations
 
-import logging
 import signal
 import threading
 import time
 import uuid
+from collections.abc import Awaitable, Callable
 from contextlib import asynccontextmanager
-from typing import Awaitable, Callable
 
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
@@ -82,12 +82,7 @@ async def lifespan(app: FastAPI):
     database.init_db()
     logger.info("app.ready")
     yield
-    logger.info(
-        "app.draining",
-        extra={"timeout_seconds": settings.graceful_shutdown_timeout_seconds},
-    )
-    _shutdown_event.wait(timeout=settings.graceful_shutdown_timeout_seconds)
-    logger.info("app.stopped")
+    logger.info("app.draining")  # in-flight requests finish via ASGI server drain
 
 
 app = FastAPI(
@@ -101,9 +96,7 @@ app = FastAPI(
 
 # --- Middleware -------------------------------------------------------------
 @app.middleware("http")
-async def request_id_middleware(
-    request: Request, call_next: Callable[[Request], Awaitable[Response]]
-):
+async def request_id_middleware(request: Request, call_next: Callable[[Request], Awaitable[Response]]):
     request_id = request.headers.get(settings.request_id_header) or str(uuid.uuid4())
     request.state.request_id = request_id
 
@@ -142,12 +135,8 @@ async def request_id_middleware(
         )
     finally:
         elapsed = time.perf_counter() - start
-        metrics.REQUEST_COUNT.labels(
-            method=request.method, path=request.url.path, status=str(status_code)
-        ).inc()
-        metrics.REQUEST_LATENCY.labels(
-            method=request.method, path=request.url.path
-        ).observe(elapsed)
+        metrics.REQUEST_COUNT.labels(method=request.method, path=request.url.path, status=str(status_code)).inc()
+        metrics.REQUEST_LATENCY.labels(method=request.method, path=request.url.path).observe(elapsed)
         logger.info(
             "http.request.end",
             extra={
@@ -161,9 +150,7 @@ async def request_id_middleware(
 
 
 @app.middleware("http")
-async def metrics_middleware(
-    request: Request, call_next: Callable[[Request], Awaitable[Response]]
-):
+async def metrics_middleware(request: Request, call_next: Callable[[Request], Awaitable[Response]]):
     if request.url.path == "/metrics":
         return await call_next(request)
     metrics.IN_PROGRESS.inc()
@@ -228,10 +215,7 @@ def list_products(page: int = 1, page_size: int = 20):
         total = session.execute(select(func.count(database.Product.id))).scalar_one()
         rows = (
             session.execute(
-                select(database.Product)
-                .order_by(database.Product.id)
-                .offset((page - 1) * page_size)
-                .limit(page_size)
+                select(database.Product).order_by(database.Product.id).offset((page - 1) * page_size).limit(page_size)
             )
             .scalars()
             .all()
@@ -262,12 +246,9 @@ def get_product(product_id: int):
     with database.session_scope() as session:
         from sqlalchemy import select
 
-        product = (
-            session.execute(
-                select(database.Product).where(database.Product.id == product_id)
-            )
-            .scalar_one_or_none()
-        )
+        product = session.execute(
+            select(database.Product).where(database.Product.id == product_id)
+        ).scalar_one_or_none()
         if product is None:
             raise HTTPException(status_code=404, detail="Product not found")
         data = Product.model_validate(product).model_dump()

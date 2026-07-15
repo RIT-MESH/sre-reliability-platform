@@ -1,4 +1,4 @@
-﻿# Incident simulations catalog
+# Incident simulations catalog
 
 All simulations are **safe and limited to the local Docker Compose environment**
 by default. AWS-side incident actions require the explicit `--confirm-aws` flag

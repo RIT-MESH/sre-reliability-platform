@@ -1,4 +1,4 @@
-﻿# Incident response
+# Incident response
 
 ## Lifecycle
 

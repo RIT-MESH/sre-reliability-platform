@@ -1,4 +1,4 @@
-﻿#!/bin/bash
+#!/bin/bash
 set -euo pipefail
 # User-data: installs Docker, pulls the app image and runs it.
 # Secrets are NOT embedded here; the app reads them at runtime via IAM/SSM.

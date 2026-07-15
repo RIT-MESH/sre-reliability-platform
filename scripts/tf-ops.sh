@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Terraform operations wrapper for an environment (dev|prod).
 # Usage: tf-ops.sh <init|validate|plan|apply|destroy> [environment]
 set -euo pipefail

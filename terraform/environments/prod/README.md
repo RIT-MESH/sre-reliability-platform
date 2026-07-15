@@ -1,4 +1,4 @@
-﻿# prod environment
+# prod environment
 
 Availability-optimised defaults: 3 AZs, Multi-AZ RDS, 2-node Redis failover,
 NAT gateway per AZ, deletion protection on, 30-day backups.

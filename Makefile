@@ -1,4 +1,4 @@
-﻿.PHONY: help up down restart logs ps validate lint test tf-validate tf-plan tf-apply tf-destroy health backup restore loadtest recover clean
+.PHONY: help up down restart logs ps validate lint test tf-validate tf-plan tf-apply tf-destroy health backup restore loadtest recover clean
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  %-18s %s\n", $$1, $$2}'

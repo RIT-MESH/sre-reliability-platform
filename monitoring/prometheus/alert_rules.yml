@@ -1,4 +1,4 @@
-﻿groups:
+groups:
   - name: sre-platform-app
     rules:
       - alert: HighRequestLatencyP95

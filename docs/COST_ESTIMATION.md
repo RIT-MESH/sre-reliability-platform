@@ -1,4 +1,4 @@
-﻿# Cost estimation
+# Cost estimation
 
 > These are **planning estimates**, not a quote. Always verify with the
 > [AWS Pricing Calculator](https://calculator.aws) for your region and usage.

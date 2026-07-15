@@ -1,9 +1,10 @@
-﻿"""SQLAlchemy ORM models.
+"""SQLAlchemy ORM models.
 
 Kept separate from the engine/session layer so tests and other modules can
 import the table metadata (`Base.metadata`) without triggering a database
 connection.
 """
+
 from __future__ import annotations
 
 from sqlalchemy import Column, Float, Index, Integer, String

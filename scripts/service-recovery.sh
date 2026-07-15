@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Recover a service in the local stack after an incident simulation.
 # Usage: service-recovery.sh [app|redis|postgres|all]
 set -euo pipefail

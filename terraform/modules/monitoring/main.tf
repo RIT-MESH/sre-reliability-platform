@@ -1,4 +1,4 @@
-﻿terraform { required_version = ">= 1.7.0" }
+terraform { required_version = ">= 1.7.0" }
 
 # SNS alert topic + optional email subscription
 resource "aws_sns_topic" "alerts" {

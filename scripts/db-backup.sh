@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Manual PostgreSQL backup to a file (local stack) or S3 (AWS via flag).
 # Usage: db-backup.sh [--s3 s3://bucket/path]
 set -euo pipefail
