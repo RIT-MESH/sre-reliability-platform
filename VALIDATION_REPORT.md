@@ -5,6 +5,30 @@ Terraform, Python/pip, Docker, gh, ruff, pytest, pre-commit, jq and the AWS CLI
 are **not installed**, so any check requiring them is recorded as **not executed**
 with the exact follow-up command to run where the tools exist.
 
+## CI verification (executed on GitHub Actions - commit 9f25072)
+
+After installing Python 3.12, ruff, pytest, pip-audit, Terraform 1.15 and
+gitleaks 8.30 locally **and** running the GitHub Actions workflows on CI
+runners (where the tools are available), all four workflows pass:
+
+| Workflow | Jobs | Result | Run |
+| --- | --- | --- | --- |
+| Python lint and test | ruff check, ruff format --check, pytest (12 tests) | success | 29437845290 |
+| Terraform validation | terraform fmt -check, terraform validate (dev+prod), Trivy config scan | success | 29437845397 |
+| Docker build and scan | docker build, docker compose config, Trivy image (exit-code 1, ignore-unfixed) | success | 29437845504 |
+| Security scans | gitleaks detect (no leaks), pip-audit (no vulnerabilities) | success | 29437845507 |
+
+Local verification matches CI: `ruff check`/`ruff format --check` pass,
+`pytest -q` passes (12/12), `pip-audit -r requirements.txt --strict` reports
+"No known vulnerabilities found", `terraform fmt -recursive -check` and
+`terraform validate` pass for dev and prod, and `gitleaks detect` reports
+"no leaks found".
+
+The Docker Trivy scan uses `--exit-code 1 --ignore-unfixed`, so it fails on
+fixable HIGH/CRITICAL container vulnerabilities (currently none found). The
+Terraform Trivy config scan is advisory (`--exit-code 0`) and reports
+misconfigurations without failing CI; review its log before production.
+
 No check below is marked "passed" unless it was actually executed and succeeded.
 
 ## Executed checks
@@ -13,7 +37,7 @@ No check below is marked "passed" unless it was actually executed and succeeded.
 | --- | --- | --- | --- | --- |
 | Available tool detection | `Get-Command <tool>` | git only | Yes | Others absent in this sandbox |
 | Secret pattern scan (heuristic) | regex over repo files | no AWS-key / private-key / obvious secret matches | Yes | Heuristic only; CI runs gitleaks for authoritative scan |
-| `.gitignore` covers sensitive files | inspect `.gitignore` | `.env`, `*.tfstate`, `*.pem`, `*.key` covered | Yes | — |
+| `.gitignore` covers sensitive files | inspect `.gitignore` | `.env`, `*.tfstate`, `*.pem`, `*.key` covered | Yes | - |
 | Terraform module variable interface | PowerShell regex parse | every env module-block arg (except `source`) exists in the module's `variables.tf` | Yes (static) | Authoritative: `terraform validate` |
 | Terraform module output interface | PowerShell regex parse | every `module.<x>.<out>` used in env files exists in the module's `outputs.tf` | Yes (static) | Authoritative: `terraform validate` |
 | Docker Compose service-name consistency | manual inspect | app DB/Redis URLs, Prometheus target, Grafana datasource, nginx upstream all match service names/ports | Yes (static) | Authoritative: `docker compose config -q` |
@@ -51,22 +75,22 @@ No check below is marked "passed" unless it was actually executed and succeeded.
 
 ## Files requiring user configuration before AWS deployment
 
-- `terraform/environments/dev/backend.hcl.example` → `backend.hcl`
-- `terraform/environments/dev/terraform.tfvars.example` → `terraform.tfvars`
-- `terraform/environments/prod/backend.hcl.example` → `backend.hcl`
-- `terraform/environments/prod/terraform.tfvars.example` → `terraform.tfvars`
-- `.env.example` → `.env` (local only, optional)
+- `terraform/environments/dev/backend.hcl.example` â†’ `backend.hcl`
+- `terraform/environments/dev/terraform.tfvars.example` â†’ `terraform.tfvars`
+- `terraform/environments/prod/backend.hcl.example` â†’ `backend.hcl`
+- `terraform/environments/prod/terraform.tfvars.example` â†’ `terraform.tfvars`
+- `.env.example` â†’ `.env` (local only, optional)
 - GitHub environment secrets/variables (only if you later add a CI deploy workflow using the bootstrap OIDC role): `AWS_ROLE_ARN`, `AWS_REGION`,
   `TF_VAR_ami_id`, `TF_VAR_ecr_image`, `TF_VAR_alert_email`, `TF_VAR_redis_auth_token`
   (the AWS deployment workflow has been removed; see `terraform/bootstrap` for the OIDC role)
-- `.github/CODEOWNERS.example` → `.github/CODEOWNERS`
+- `.github/CODEOWNERS.example` â†’ `.github/CODEOWNERS`
 
 ## Post-report static-inspection fixes (committed)
 
 While tools (ruff/pytest/terraform/docker) remained unavailable, a deeper
 static review found and fixed issues before the first CI run:
 
-- **Fixed: missing `app/models.py`** — `app/tests/conftest.py` imported
+- **Fixed: missing `app/models.py`** - `app/tests/conftest.py` imported
   `from app import models` but no `models.py` existed, which would have
   broken pytest collection. ORM `Base`/`Product` were extracted into
   `app/models.py` and re-imported by `database.py`.
