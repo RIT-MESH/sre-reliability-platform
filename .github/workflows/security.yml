@@ -13,7 +13,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: gitleaks
-        uses: gitleaks/gitleaks-action@v6
+        uses: gitleaks/gitleaks-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -28,3 +28,4 @@ jobs:
           python -m pip install --upgrade pip
           pip install pip-audit
           pip-audit -r requirements.txt --strict
+

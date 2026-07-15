@@ -1,6 +1,7 @@
 ﻿name: Python lint and test
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
     paths: ["app/**", ".github/workflows/python-lint-test.yml"]
@@ -30,3 +31,4 @@ jobs:
         run: ruff format --check .
       - name: Unit tests
         run: pytest -q
+

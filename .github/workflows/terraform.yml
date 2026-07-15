@@ -1,6 +1,7 @@
 ﻿name: Terraform validation
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
     paths: ["terraform/**", ".github/workflows/terraform.yml"]
@@ -37,3 +38,4 @@ jobs:
         uses: aquasecurity/tfsec-action@v1.0.3
         with:
           working_directory: terraform
+
