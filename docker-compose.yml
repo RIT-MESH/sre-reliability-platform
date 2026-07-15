@@ -1,0 +1,114 @@
+﻿# Local Docker Compose stack for the sre-reliability-platform.
+# Mirrors the AWS topology (app + Postgres + Redis + reverse proxy + metrics)
+# in a single host for development, demos and incident simulations.
+#
+# Start:  make up   (or docker compose up -d)
+# Stop:   make down
+# Logs:   make logs
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: shop
+      POSTGRES_PASSWORD: shop
+      POSTGRES_DB: shop
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shop -d shop"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks: [sre-net]
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks: [sre-net]
+
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    environment:
+      ENVIRONMENT: local
+      DATABASE_URL: postgresql+psycopg://shop:shop@postgres:5432/shop
+      REDIS_URL: redis://redis:6379/0
+      CACHE_ENABLED: "true"
+      CACHE_TTL_SECONDS: "30"
+      WORKERS: "4"
+      LOG_LEVEL: INFO
+      INJECT_LATENCY_MS: "0"
+      INJECT_FAILURE_RATE: "0"
+      HIGH_CPU_LOAD: "false"
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    expose: ["8000"]
+    networks: [sre-net]
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.27-alpine
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "8080:80"
+    depends_on: [app]
+    networks: [sre-net]
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v2.55.0
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/prometheus/alert_rules.yml:/etc/prometheus/alert_rules.yml:ro
+      - promdata:/prometheus
+    ports:
+      - "9090:9090"
+    networks: [sre-net]
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:11.3.0
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafdata:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on: [prometheus]
+    networks: [sre-net]
+    restart: unless-stopped
+
+  locust:
+    image: locustio/locust:2.32.0
+    profiles: ["loadtest"]
+    volumes:
+      - ./load-testing/locustfile.py:/mnt/locust/locustfile.py:ro
+    ports:
+      - "8089:8089"
+    command: ["-f", "/mnt/locust/locustfile.py", "--host", "http://nginx:80"]
+    depends_on: [nginx]
+    networks: [sre-net]
+
+networks:
+  sre-net:
+    driver: bridge
+
+volumes:
+  pgdata:
+  promdata:
+  grafdata:

@@ -1,0 +1,49 @@
+﻿groups:
+  - name: sre-platform-app
+    rules:
+      - alert: HighRequestLatencyP95
+        expr: histogram_quantile(0.95, sum by (le, path) (rate(http_request_duration_seconds_bucket[5m]))) > 0.5
+        for: 5m
+        labels: { severity: warning, team: sre }
+        annotations:
+          summary: "P95 request latency above 500ms on {{ $labels.path }}"
+          description: "P95 latency is {{ $value }}s (SLO: 0.5s)."
+
+      - alert: HighHttp5xxRate
+        expr: |
+          sum(rate(http_requests_total{status=~"5.."}[5m]))
+          / sum(rate(http_requests_total[5m])) > 0.01
+        for: 5m
+        labels: { severity: critical, team: sre }
+        annotations:
+          summary: "HTTP 5xx error rate above 1%"
+          description: "5xx ratio is {{ $value | humanizePercentage }} (SLO: <1%)."
+
+      - alert: DatabaseUnavailable
+        expr: app_database_available == 0
+        for: 1m
+        labels: { severity: critical, team: sre }
+        annotations:
+          summary: "Database unavailable"
+
+      - alert: RedisUnavailable
+        expr: app_redis_available == 0
+        for: 2m
+        labels: { severity: warning, team: sre }
+        annotations:
+          summary: "Redis unavailable (app running in degraded mode)"
+          description: "Cache is down; serving from DB. No user-visible 5xx expected."
+
+      - alert: HighInFlightRequests
+        expr: http_requests_in_progress > 100
+        for: 5m
+        labels: { severity: warning, team: sre }
+        annotations:
+          summary: "High number of in-flight requests"
+
+      - alert: AppDown
+        expr: up{job="fastapi"} == 0
+        for: 1m
+        labels: { severity: critical, team: sre }
+        annotations:
+          summary: "FastAPI target {{ $labels.instance }} is down"
